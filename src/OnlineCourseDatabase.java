@@ -4,40 +4,65 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iterable<CourseData> {
-    private ArrayList<CourseData> courseData;
+    private ArrayList<CourseData> courseData = new ArrayList<CourseData>();
+    private ArrayList<String> experienceLevelList = new ArrayList<String>(5);
+    private ArrayList<String> courseTypeList = new ArrayList<String>(5);
+    private ArrayList<String> platformList = new ArrayList<String>(5);
+    private ArrayList<String> completionStatusList = new ArrayList<String>(5);
+    private ArrayList<String> dropoutReasonList = new ArrayList<String>(5);
 
     public OnlineCourseDatabase(File dbFile) throws FileNotFoundException {
-        ArrayList<String> experienceLevel = new ArrayList<String>(5);
-        ArrayList<String> courseType = new ArrayList<String>(5);
-        ArrayList<String> platform = new ArrayList<String>(5);
-        ArrayList<String> completionStatus = new ArrayList<String>(5);
-        ArrayList<String> dropoutReason = new ArrayList<String>(5);
-
-
         // Find sublist data
         Scanner scanner = new Scanner(dbFile);
+        scanner.nextLine();
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             String[] parts = line.split(",");
             for (int idx = 0; idx < parts.length; idx++) {
-                if (!experienceLevel.contains(parts[1])) {
-                    experienceLevel.add(parts[1]);
+                if (!experienceLevelList.contains(parts[1])) {
+                    experienceLevelList.add(parts[1]);
                 }
-                if (!courseType.contains(parts[2])) {
-                    courseType.add(parts[2]);
+                if (!courseTypeList.contains(parts[2])) {
+                    courseTypeList.add(parts[2]);
                 }
-                if (!platform.contains(parts[3])) {
-                    platform.add(parts[3]);
+                if (!platformList.contains(parts[3])) {
+                    platformList.add(parts[3]);
                 }
-                if (!completionStatus.contains(parts[6])) {
-                    completionStatus.add(parts[6]);
+                if (!completionStatusList.contains(parts[6])) {
+                    completionStatusList.add(parts[6]);
                 }
-                if (!dropoutReason.contains(parts[8])) {
-                    dropoutReason.add(parts[8]);
+                if (!dropoutReasonList.contains(parts[8])) {
+                    dropoutReasonList.add(parts[8]);
                 }
             }
         }
-            // Load course results data
+        Scanner scanner1 = new Scanner(dbFile);
+        scanner1.nextLine();
+        while (scanner1.hasNextLine()) {
+            String line = scanner1.nextLine();
+            String[] parts = line.split(",");
+            courseData.add(new CourseData(parts[0],
+                    (byte) experienceLevelList.indexOf(parts[1]),
+                    (byte) courseTypeList.indexOf(parts[2]),
+                    (byte) platformList.indexOf(parts[3]),
+                    (byte) Integer.parseInt(parts[4]),
+                    (byte) Integer.parseInt(parts[5]),
+                    (byte) completionStatusList.indexOf(parts[6]),
+                    (byte) Integer.parseInt(parts[7]),
+                    (byte) dropoutReasonList.indexOf(parts[8]),
+                    (byte) Integer.parseInt(parts[9])
+            ));
+        }
+
+        //TODO: REMOVE DEBUG MAYBE FIX DUPLICATE SCANNERS
+        System.out.println(experienceLevelList);
+        System.out.println(courseTypeList);
+        System.out.println(platformList);
+        System.out.println(completionStatusList);
+        System.out.println(dropoutReasonList);
+        for (CourseData data : courseData) {
+            System.out.println(data);
+        }
     }
 
     /**
@@ -48,7 +73,7 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public CourseData getCourseRecordAt(int index) {
-        return null;
+        return courseData.get(index);
     }
 
     /**
@@ -61,7 +86,18 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public String getCourseRecordString(CourseData course) {
-        return "";
+        return String.format("[%s], [%s], [%s], [%s], [%d], [%d], [%s], [%d], [%s], [%d]",
+                course.userId(),
+                experienceLevelList.get(course.experienceLevel()),
+                courseTypeList.get(course.courseType()),
+                platformList.get(course.platform()),
+                course.hoursPerWeek(),
+                course.courseDuration(),
+                completionStatusList.get(course.completionStatus()),
+                course.completionPercentage(),
+                dropoutReasonList.get(course.dropoutReason()),
+                course.satisfactionScore()
+                );
     }
 
     /**
@@ -71,7 +107,7 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public int size() {
-        return 0;
+        return courseData.size();
     }
 
     /**
@@ -81,7 +117,11 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public String[] getExperienceLevelOptions() {
-        return new String[0];
+        String[] experienceLevelOptions = new String[experienceLevelList.size()];
+        for (int idx = 0; idx < experienceLevelList.size(); idx++) {
+            experienceLevelOptions[idx] = experienceLevelList.get(idx);
+        }
+        return experienceLevelOptions;
     }
 
     /**
@@ -91,17 +131,25 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public String[] getCourseTypeOptions() {
-        return new String[0];
+        String[] courseTypeOptions = new String[courseTypeList.size()];
+        for (int idx = 0; idx < courseTypeList.size(); idx++) {
+            courseTypeOptions[idx] = courseTypeList.get(idx);
+        }
+        return courseTypeOptions;
     }
 
     /**
-     * Creates and returns an array representing all possible platform options
+     * Creates and returns an array representing all possible platformList options
      *
      * @return array containing options
      */
     @Override
     public String[] getPlatformOptions() {
-        return new String[0];
+        String[] platformTypeOptions = new String[platformList.size()];
+        for (int idx = 0; idx < platformList.size(); idx++) {
+            platformTypeOptions[idx] = platformList.get(idx);
+        }
+        return platformTypeOptions;
     }
 
     /**
@@ -111,7 +159,11 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public String[] getCompletionStatusOptions() {
-        return new String[0];
+        String[] completionStatusOptions = new String[completionStatusList.size()];
+        for (int idx = 0; idx < completionStatusList.size(); idx++) {
+            completionStatusOptions[idx] = completionStatusList.get(idx);
+        }
+        return completionStatusOptions;
     }
 
     /**
@@ -121,7 +173,11 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public String[] getDropoutReasonOptions() {
-        return new String[0];
+        String[] dropoutReasonOptions = new String[dropoutReasonList.size()];
+        for (int idx = 0; idx < dropoutReasonList.size(); idx++) {
+            dropoutReasonOptions[idx] = dropoutReasonList.get(idx);
+        }
+        return dropoutReasonOptions;
     }
 
     /**
@@ -129,7 +185,7 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      *
      * @param experienceLevelIndex  index of the experience level to filter, or -1 for no filtering on this field
      * @param courseTypeIndex       index of the course type to filter, or -1 for no filtering on this field
-     * @param platformIndex         index of the platform to filter, or -1 for no filtering on this field
+     * @param platformIndex         index of the platformList to filter, or -1 for no filtering on this field
      * @param completionStatusIndex index of the completion status to filter, or -1 for no filtering on this field
      * @param dropoutReasonIndex    index of the dropout reason to filter, or -1 for no filtering on this field
      * @return statistics for the results of filtering operation.  If filtering results in no records, will contain
@@ -137,7 +193,14 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public CourseStats calcFilteredAverages(byte experienceLevelIndex, byte courseTypeIndex, byte platformIndex, byte completionStatusIndex, byte dropoutReasonIndex) {
-        return null;
+        ArrayList<CourseData> filteredCourseData = new ArrayList<CourseData>();
+        filteredCourseData.addAll(courseData);
+        for (CourseData data : filteredCourseData) {
+            if (getExperienceLevelOptions()[0] == experienceLevelIndex) {
+
+            }
+        }
+        CourseStats stats = new CourseStats();
     }
 
     /**

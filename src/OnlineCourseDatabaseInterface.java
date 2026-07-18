@@ -41,7 +41,7 @@ public interface OnlineCourseDatabaseInterface {
     public String[] getCourseTypeOptions();
 
     /**
-     * Creates and returns an array representing all possible platform options
+     * Creates and returns an array representing all possible platformList options
      * @return      array containing options
      */
     public String[] getPlatformOptions();
@@ -62,7 +62,7 @@ public interface OnlineCourseDatabaseInterface {
      * Calculates and returns statistics based on filtered results
      * @param experienceLevelIndex      index of the experience level to filter, or -1 for no filtering on this field
      * @param courseTypeIndex           index of the course type to filter, or -1 for no filtering on this field
-     * @param platformIndex             index of the platform to filter, or -1 for no filtering on this field
+     * @param platformIndex             index of the platformList to filter, or -1 for no filtering on this field
      * @param completionStatusIndex     index of the completion status to filter, or -1 for no filtering on this field
      * @param dropoutReasonIndex        index of the dropout reason to filter, or -1 for no filtering on this field
      * @return  statistics for the results of filtering operation.  If filtering results in no records, will contain
