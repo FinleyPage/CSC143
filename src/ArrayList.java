@@ -2,6 +2,7 @@
 
 import java.util.*;
 
+@SuppressWarnings("no comment")
 public class ArrayList<E> implements Iterable<E> {
     private E[] elementData; // list of values
     private int size;        // current number of elements in the list

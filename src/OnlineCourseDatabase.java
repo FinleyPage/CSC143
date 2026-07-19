@@ -3,20 +3,39 @@ import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.Scanner;
 
+/**
+ *
+ * This class creates a database to store information and statistics about each course response
+ *
+ */
 public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iterable<CourseData> {
-    private ArrayList<CourseData> courseData = new ArrayList<CourseData>();
-    private ArrayList<String> experienceLevelList = new ArrayList<String>(5);
-    private ArrayList<String> courseTypeList = new ArrayList<String>(5);
-    private ArrayList<String> platformList = new ArrayList<String>(5);
-    private ArrayList<String> completionStatusList = new ArrayList<String>(5);
-    private ArrayList<String> dropoutReasonList = new ArrayList<String>(5);
 
+    /** Creates a database to store information about each course response **/
+    private final ArrayList<CourseData> courseData = new ArrayList<>();
+    /** Creates an arraylist to store experience levels as a sublist (all the possible choices) **/
+    private final ArrayList<String> experienceLevelList = new ArrayList<>(5);
+    /** Creates an arraylist to store course types as a sublist (all the possible choices) **/
+    private final ArrayList<String> courseTypeList = new ArrayList<>(5);
+    /** Creates an arraylist to store platforms as a sublist (all the possible choices) **/
+    private final ArrayList<String> platformList = new ArrayList<>(5);
+    /** Creates an arraylist to store completion statuses as a sublist (all the possible choices) **/
+    private final ArrayList<String> completionStatusList = new ArrayList<>(5);
+    /** Creates an arraylist to store dropout reasons as a sublist (all the possible choices) **/
+    private final ArrayList<String> dropoutReasonList = new ArrayList<>(5);
+
+    /**
+     *
+     * Constructor reads a file, locates specifier types, and enters data into record
+     *
+     * @param dbFile                    The file containing course response details
+     * @throws FileNotFoundException    If the file is not readable or cannot be found
+     */
     public OnlineCourseDatabase(File dbFile) throws FileNotFoundException {
         // Find sublist data
-        Scanner scanner = new Scanner(dbFile);
-        scanner.nextLine();
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
+        Scanner firstScan = new Scanner(dbFile);
+        firstScan.nextLine();
+        while (firstScan.hasNextLine()) {
+            String line = firstScan.nextLine();
             String[] parts = line.split(",");
             for (int idx = 0; idx < parts.length; idx++) {
                 if (!experienceLevelList.contains(parts[1])) {
@@ -36,10 +55,10 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
                 }
             }
         }
-        Scanner scanner1 = new Scanner(dbFile);
-        scanner1.nextLine();
-        while (scanner1.hasNextLine()) {
-            String line = scanner1.nextLine();
+        Scanner secondScan = new Scanner(dbFile);
+        secondScan.nextLine();
+        while (secondScan.hasNextLine()) {
+            String line = secondScan.nextLine();
             String[] parts = line.split(",");
             courseData.add(new CourseData(parts[0],
                     (byte) experienceLevelList.indexOf(parts[1]),
@@ -52,16 +71,6 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
                     (byte) dropoutReasonList.indexOf(parts[8]),
                     (byte) Integer.parseInt(parts[9])
             ));
-        }
-
-        //TODO: REMOVE DEBUG MAYBE FIX DUPLICATE SCANNERS
-        System.out.println(experienceLevelList);
-        System.out.println(courseTypeList);
-        System.out.println(platformList);
-        System.out.println(completionStatusList);
-        System.out.println(dropoutReasonList);
-        for (CourseData data : courseData) {
-            System.out.println(data);
         }
     }
 
@@ -86,7 +95,7 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public String getCourseRecordString(CourseData course) {
-        return String.format("[%s], [%s], [%s], [%s], [%d], [%d], [%s], [%d], [%s], [%d]",
+        return String.format("[%s, %s, %s, %s, %d, %d, %s, %d, %s, %d]",
                 course.userId(),
                 experienceLevelList.get(course.experienceLevel()),
                 courseTypeList.get(course.courseType()),
@@ -193,21 +202,57 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      */
     @Override
     public CourseStats calcFilteredAverages(byte experienceLevelIndex, byte courseTypeIndex, byte platformIndex, byte completionStatusIndex, byte dropoutReasonIndex) {
-        ArrayList<CourseData> filteredCourseData = new ArrayList<CourseData>();
-        filteredCourseData.addAll(courseData);
-        for (CourseData data : filteredCourseData) {
-            if (getExperienceLevelOptions()[0] == experienceLevelIndex) {
+        double totalHoursPerWeek = 0;
+        double totalCourseDuration = 0;
+        double totalCompletionPercent = 0;
+        double totalSatisfactionScore = 0;
+        int size = 0;
 
+        for (CourseData data : courseData) {
+            boolean include = true;
+            if (experienceLevelIndex != -1 && !(data.experienceLevel() == experienceLevelIndex)) {
+                include = false;
+            } else if (courseTypeIndex != -1 && !(data.courseType() == courseTypeIndex)) {
+                include = false;
+            } else if (platformIndex != -1 && !(data.platform() == platformIndex)) {
+                include = false;
+            } else if (completionStatusIndex != -1 && !(data.completionStatus() == completionStatusIndex)) {
+                include = false;
+            } else if (dropoutReasonIndex != -1 && !(data.dropoutReason() == dropoutReasonIndex)) {
+                include = false;
+            }
+
+            if (include) {
+                size += 1;
+                totalHoursPerWeek += data.hoursPerWeek();
+                totalCourseDuration += data.courseDuration();
+                totalCompletionPercent += data.completionPercentage();
+                totalSatisfactionScore += data.satisfactionScore();
             }
         }
-        CourseStats stats = new CourseStats();
+        double avgHoursPerWeek = 0;
+        double avgCourseDuration = 0;
+        double avgCompletionPercent = 0;
+        double avgSatisfactionScore = 0;
+
+        if (size != 0) {
+            avgHoursPerWeek = totalHoursPerWeek/size;
+            avgCourseDuration = totalCourseDuration/size;
+            avgCompletionPercent = totalCompletionPercent/size;
+            avgSatisfactionScore = totalSatisfactionScore/size;
+        }
+
+        return new CourseStats(size, avgHoursPerWeek, avgCourseDuration, avgCompletionPercent, avgSatisfactionScore);
     }
 
     /**
-     * @return
+     *
+     * Returns an iterator over this collection
+     *
+     * @return iterator for CourseData objects
      */
     @Override
     public Iterator<CourseData> iterator() {
-        return null;
+        return courseData.iterator();
     }
 }
