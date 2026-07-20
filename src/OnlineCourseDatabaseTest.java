@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SuppressWarnings("no comment")
+
 class OnlineCourseDatabaseTest {
     OnlineCourseDatabase db;
     CourseDataFilteringGui gui;
@@ -20,7 +20,8 @@ class OnlineCourseDatabaseTest {
 
     @org.junit.jupiter.api.Test
     void getCourseRecordString() {
-        assertEquals("[U0500, Working Professional, Non-Tech, Coursera, 6, 22, In Progress, 85, No Dropout, 5]", db.getCourseRecordString(db.getCourseRecordAt(499)));
+        assertEquals("[U0500, Working Professional, Non-Tech, Coursera, 6, 22, In Progress, 85, No Dropout, 5]",
+                    db.getCourseRecordString(db.getCourseRecordAt(499)));
     }
 
     @org.junit.jupiter.api.Test
@@ -77,9 +78,19 @@ class OnlineCourseDatabaseTest {
 
     @org.junit.jupiter.api.Test
     void calcFilteredAverages() {
+        // Checked values in Excel
+        assertEquals(2, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 3).recordCount());
+        assertEquals(16, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 3).avgCompletionPercent(), 0.001);
+        assertEquals(21.5, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 3).avgCourseDuration(), 0.001);
+        assertEquals(9, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 3).avgHrsPerWeek(), 0.001);
+        assertEquals(3.5, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 3).avgSatisfactionScore(), 0.001);
+        // No classes match
+        assertEquals(0, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 1).avgSatisfactionScore());
+
     }
 
     @org.junit.jupiter.api.Test
     void iterator() {
+        assertEquals(new CourseData("U0001", (byte) 0, (byte) 0, (byte) 0, (byte) 16, (byte) 8, (byte) 0, (byte) 67, (byte) 0, (byte) 2), db.iterator().next());
     }
 }

@@ -55,6 +55,7 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
                 }
             }
         }
+        // add all entries to record using indexes
         Scanner secondScan = new Scanner(dbFile);
         secondScan.nextLine();
         while (secondScan.hasNextLine()) {
