@@ -9,6 +9,5 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         db = new OnlineCourseDatabase(new File("OnlineCourseDataset.csv"));
         gui = new CourseDataFilteringGui(db);
-
     }
 }

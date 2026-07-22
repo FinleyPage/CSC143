@@ -153,6 +153,37 @@ public class ArrayList<E> implements Iterable<E> {
         }
     }
 
+    public E[] toArray(E[] array) {
+        if (array == null) {
+            throw new IllegalArgumentException("Array cannot be null");
+        }
+        // if list fits return list
+        // if too small create new array size of list
+        // if array bigger than list set ending elements to null
+
+        if (size == array.length) {
+            for (int idx = 0; idx < size; idx++) {
+                array[idx] = elementData[idx];
+            }
+            return array;
+        } else if (size > array.length) {
+            E[] copyArray = Arrays.copyOf(array, size);
+            for (int idx = 0; idx < size; idx++) {
+                copyArray[idx] = elementData[idx];
+            }
+            return copyArray;
+        } else {
+            for (int idx = 0; idx < size; idx++) {
+                array[idx] = elementData[idx];
+            }
+
+            for (int idx = size; idx < array.length; idx++) {
+                array[idx] = null;
+            }
+            return array;
+        }
+    }
+
     private class ArrayListIterator implements Iterator<E> {
         private int position;           // current position within the list
         private boolean removeOK;       // whether it's okay to remove now
@@ -190,33 +221,6 @@ public class ArrayList<E> implements Iterable<E> {
             ArrayList.this.remove(position - 1);
             position--;
             removeOK = false;
-        }
-
-        public E[] toArray(E[] array) {
-            if (array == null) {
-                throw new IllegalArgumentException("Array cannot be null");
-            }
-            // if list fits return list
-            // if too small create new array size of list
-            // if array bigger than list set ending elements to null
-
-            if (size == array.length) {
-                for (int idx = 0; idx < size; idx++) {
-                    array[idx] = elementData[idx];
-                }
-                return array;
-            } else if (size > array.length) {
-                return Arrays.copyOf(elementData, size);
-            } else {
-                for (int idx = 0; idx < size; idx++) {
-                    array[idx] = elementData[idx];
-                }
-
-                for (int idx = size; idx < array.length; idx++) {
-                    array[idx] = null;
-                }
-                return array;
-            }
         }
     }
 }
