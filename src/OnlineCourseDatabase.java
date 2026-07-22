@@ -78,11 +78,14 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
     /**
      * Retrieves the course record at the specified index in the database
      *
-     * @param index the index of the desired rouse record
+     * @param index the index of the desired course record if index in range
      * @return the course record at the specified position
      */
     @Override
     public CourseData getCourseRecordAt(int index) {
+        if (index >= size() || index < 0) {
+            throw new IndexOutOfBoundsException("Index out of range");
+        }
         return courseData.get(index);
     }
 
@@ -91,11 +94,14 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
      * For example, with the last row of data in the sample file, this string would be returned:
      * "[U0500, Working Professional, Non-Tech, Coursera, 6, 22, In Progress, 85, No Dropout, 5]"
      *
-     * @param course online course record to render
+     * @param course online course record to render if course is not null
      * @return human-readable, complete representation of the course record
      */
     @Override
     public String getCourseRecordString(CourseData course) {
+        if (course == null) {
+            throw new IllegalArgumentException("Course cannot be null");
+        }
         return String.format("[%s, %s, %s, %s, %d, %d, %s, %d, %s, %d]",
                 course.userId(),
                 experienceLevelList.get(course.experienceLevel()),
@@ -231,10 +237,10 @@ public class OnlineCourseDatabase implements OnlineCourseDatabaseInterface, Iter
                 totalSatisfactionScore += data.satisfactionScore();
             }
         }
-        double avgHoursPerWeek = 0;
-        double avgCourseDuration = 0;
-        double avgCompletionPercent = 0;
-        double avgSatisfactionScore = 0;
+        double avgHoursPerWeek = -1;
+        double avgCourseDuration = -1;
+        double avgCompletionPercent = -1;
+        double avgSatisfactionScore = -1;
 
         if (size != 0) {
             avgHoursPerWeek = totalHoursPerWeek/size;

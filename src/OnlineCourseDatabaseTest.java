@@ -1,8 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class OnlineCourseDatabaseTest {
@@ -22,6 +21,10 @@ class OnlineCourseDatabaseTest {
     void getCourseRecordString() {
         assertEquals("[U0500, Working Professional, Non-Tech, Coursera, 6, 22, In Progress, 85, No Dropout, 5]",
                     db.getCourseRecordString(db.getCourseRecordAt(499)));
+        assertThrows(IndexOutOfBoundsException.class, ()-> db.getCourseRecordString(db.getCourseRecordAt(500)));
+        assertThrows(IndexOutOfBoundsException.class, ()-> db.getCourseRecordString(db.getCourseRecordAt(-1)));
+
+        assertThrows(IllegalArgumentException.class, ()-> db.getCourseRecordString(null));
     }
 
     @org.junit.jupiter.api.Test
@@ -85,7 +88,7 @@ class OnlineCourseDatabaseTest {
         assertEquals(9, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 3).avgHrsPerWeek(), 0.001);
         assertEquals(3.5, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 3).avgSatisfactionScore(), 0.001);
         // No classes match
-        assertEquals(0, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 1).avgSatisfactionScore());
+        assertEquals(-1, db.calcFilteredAverages((byte) 1, (byte) 1, (byte) 0, (byte) 1, (byte) 1).avgSatisfactionScore());
 
     }
 
